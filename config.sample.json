@@ -1,0 +1,6 @@
+{
+  "KEY_STOP": "stop",
+  "DB_FILE_NAME": "./data/_db.db",
+  "TRACKING_ACCOUNT": "rudex",
+  "MIN_AMOUNT": 1000
+}
