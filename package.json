@@ -1,0 +1,24 @@
+{
+  "name": "sponsorapi",
+  "version": "1.0.0",
+  "description": "backend api for smoke sponsor service which is a page listing sponsors",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smokenetwork/sponsorapi.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/smokenetwork/sponsorapi/issues"
+  },
+  "homepage": "https://github.com/smokenetwork/sponsorapi#readme",
+  "dependencies": {
+    "@smokenetwork/smoke-js": "^0.1.2",
+    "config.json": "0.0.4",
+    "sqlite-async": "^1.0.11"
+  }
+}
