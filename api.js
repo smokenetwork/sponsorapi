@@ -24,6 +24,21 @@ fetch_data = async () => {
   return data;
 };
 
+fetch_status = async () => {
+  let status = myCache.get("status");
+
+  if (typeof status !== 'undefined' && status !== null){
+    // do nothing
+  } else {
+    status = await db.getDB().all('SELECT * FROM cronjob');
+
+    // remember to set cache
+    myCache.set("status", status);
+  }
+
+  return status;
+};
+
 serverStart = async () => {
   await db.init();
 
@@ -32,8 +47,20 @@ serverStart = async () => {
   router.get('/list', async (req, res) => {
     try {
       const data = await fetch_data();
-
       res.status(200).send(`${JSON.stringify(data)}`);
+    } catch(e) {
+      console.log(e);
+      res.status(500).send(JSON.stringify(e));
+    } finally {
+
+    }
+  });
+
+
+  router.get('/status', async (req, res) => {
+    try {
+      const status = await fetch_status();
+      res.status(200).send(`${JSON.stringify(status)}`);
     } catch(e) {
       console.log(e);
       res.status(500).send(JSON.stringify(e));
