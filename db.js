@@ -26,23 +26,46 @@ const SQLITE_OPEN_WAL =             0x00080000;  /* VFS only */
 let _db = null;
 
 const init = async () => {
-  if (fs.existsSync(config.DB_FILE_NAME)) {
-    //file exists
-    _db = await Database.open(config.DB_FILE_NAME, SQLITE_OPEN_READWRITE);
-  } else {
-    _db = await Database.open(config.DB_FILE_NAME, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
+  try {
+    if (fs.existsSync(config.DB_FILE_NAME)) {
+      //file exists
+      _db = await Database.open(config.DB_FILE_NAME, SQLITE_OPEN_READWRITE);
+    } else {
+      _db = await Database.open(config.DB_FILE_NAME, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
 
-    await _db.exec(`CREATE TABLE cronjob (datakey TEXT PRIMARY KEY, datavalue TEXT NOT NULL)`);
+      await _db.exec(`CREATE TABLE cronjob (datakey TEXT PRIMARY KEY, datavalue TEXT NOT NULL)`);
+      await _db.run(`INSERT INTO cronjob VALUES ("${config.KEY_STOP}", "1")`);
+      await _db.exec(`CREATE TABLE sponsor (accountname TEXT PRIMARY KEY, amount REAL NOT NULL, txdatetime INTEGER NOT NULL)`);
+    }
+  } catch (e) {
+    console.log(e);
 
-    await _db.run(`INSERT INTO cronjob VALUES ("${config.KEY_STOP}", "1")`);
+    await close();
+
+
+    try {
+      fs.unlinkSync(config.DB_FILE_NAME)
+    } catch(err) {
+      console.error(err)
+    }
+
+    process.exit(1);
   }
 
   return _db;
+};
+
+const close = async () => {
+  try {
+    _db.close();
+  } catch (e) {
+  }
 };
 
 module.exports = {
   init,
   getDB: () => {
     return _db;
-  }
+  },
+  close
 };

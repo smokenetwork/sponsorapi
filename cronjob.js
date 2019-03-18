@@ -39,74 +39,36 @@ const processTx = async (tx) => {
     return;
   }
 
-  // if (opt.to !== config.tracking_account) {
-  //   await updateStopThenSaveLastState(idx, con);
-  //   return;
-  // }
-  //
-  // if (opt.amount.endsWith('STEEM') === false) {
-  //   await updateStopThenSaveLastState(idx, con);
-  //   return;
-  // }
-  //
-  // // process_memo
-  // const { memo } = opt;
-  // if (memo.startsWith('getcoin') === false) {
-  //   await updateStopThenSaveLastState(idx, con);
-  //   return;
-  // }
-  //
-  // const isexist = await trackingShared.isTxinDB(`steem:${trx.trx_id}`, con);
-  // if (isexist === true) {
-  //   await updateStopThenSaveLastState(idx, con);
-  //   return;
-  // }
-  //
-  // const parsed = queryString.parseUrl(memo).query;
-  //
-  // // validate account name
-  // const isValidUsername = steem.utils.validateAccountName(parsed.a);
-  // if (isValidUsername) {
-  //   // throw new Error(isValidUsername);
-  //   await updateStopThenSaveLastState(idx, con);
-  //   return;
-  // }
-  //
-  // const sendAmount = parseFloat(opt.amount);
-  // console.log(`sendAmount=${sendAmount}`);
-  //
-  // const receiveAmount = sendAmount / price;
-  // if (receiveAmount < 0.001) {
-  //   await updateStopThenSaveLastState(idx, con);
-  //   return;
-  // }
-  //
-  // // save tx to send coin later in other process
-  // await trackingShared.saveTx(
-  //   {
-  //     id: `steem:${trx.trx_id}`,
-  //     network: 'steem',
-  //     sender: opt.from,
-  //     receiver: parsed.a,
-  //     sendAmount,
-  //     sendAsset: 'STEEM',
-  //     receiveAmount,
-  //     receiveAsset: 'WLS',
-  //     state: 0,
-  //     note: '',
-  //     txSendback: null,
-  //   },
-  //   con,
-  // );
-  //
+  if (opt.to !== config.TRACKING_ACCOUNT) {
+    await updateStopThenSaveLastState();
+    return;
+  }
+
+  if (opt.amount.endsWith('SMOKE') === false) {
+    await updateStopThenSaveLastState();
+    return;
+  }
+
+  const amount = parseFloat(opt.amount);
+  if (amount <config.MIN_AMOUNT) {
+    await updateStopThenSaveLastState();
+    return;
+  }
+
+  const accountname = opt.from;
+  const txdatetime = Math.floor(new Date(`${trx.timestamp}Z`).getTime()/1000);
+  console.log(`amount=${amount}, accountname=${accountname}, txdatetime=${txdatetime}`);
+  try {
+    await db.getDB().run(`INSERT INTO sponsor VALUES ("${accountname}", ${amount}, ${txdatetime})`);
+  } catch (e) {
+    console.log(e);
+  }
+
   await updateStopThenSaveLastState();
 };
 
 
 const loadLastState = async () => {
-  // let storeStop = stop;
-
-  // step 1. Loading last state from db
   const row = await db.getDB().get(`SELECT * FROM cronjob WHERE datakey="${config.KEY_STOP}"`);
 
   if (row) {
@@ -119,19 +81,14 @@ const loadLastState = async () => {
 const main = async () => {
   console.log('tracking...');
 
-  // let con;
-
   try {
-    // con = await db.getConnection();
-    // price = await trackingShared.getPrices('WLS_STEEM', con);
-
     await loadLastState();
 
     const dgp = await smokejs.api.getDynamicGlobalPropertiesAsync();
     // console.log(JSON.stringify(dgp));
     lastIrreversibleBlockNum = dgp.last_irreversible_block_num;
 
-    const txs = await smokejs.api.getAccountHistoryAsync(config.tracking_account, stop, 1);
+    const txs = await smokejs.api.getAccountHistoryAsync(config.TRACKING_ACCOUNT, stop, 1);
     // console.log(JSON.stringify(txs));
 
     let i = txs.length - 1;
@@ -143,11 +100,11 @@ const main = async () => {
   } catch (err) {
     console.log(err.message);
   } finally {
-    try {
-      await con.release();
-    } catch (e) {
-      // do nothing
-    }
+    // try {
+    //   await con.release();
+    // } catch (e) {
+    //   // do nothing
+    // }
   }
 };
 
@@ -166,7 +123,7 @@ const start = async () => {
 
     try {
       // eslint-disable-next-line no-await-in-loop
-      await utils.sleep(2 * 60 * 1000);
+      await utils.sleep(1 * 10 * 1000);
     } catch (err) {
       // do nothing
     }
