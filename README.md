@@ -8,9 +8,37 @@ There are 2 main components: api and cronjob
 - **http://localhost:8200/list**  
 To get the list of all sponsors
 
+```
+[  
+   {  
+      "accountname":"bankplethora",
+      "amount":1226.246,
+      "txdatetime":1545804948
+   },
+   {  
+      "accountname":"four-20",
+      "amount":1868.849,
+      "txdatetime":1545086148
+   },
+   {  
+      "accountname":"skylinebuds",
+      "amount":3500,
+      "txdatetime":1544528991
+   }
+]
+```
+
 - **http://localhost:8200/status**  
 For debug only
 
+```
+[  
+   {  
+      "datakey":"stop",
+      "datavalue":"271"
+   }
+]
+```
 
 Using embedded cache to avoid db bottleneck.
 
