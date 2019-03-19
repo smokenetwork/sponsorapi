@@ -19,6 +19,8 @@
   "dependencies": {
     "@smokenetwork/smoke-js": "^0.1.2",
     "config.json": "0.0.4",
+    "express": "^4.16.4",
+    "node-cache": "^4.2.0",
     "sqlite-async": "^1.0.11"
   }
 }
