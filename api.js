@@ -47,10 +47,10 @@ serverStart = async () => {
   router.get('/list', async (req, res) => {
     try {
       const data = await fetch_data();
-      res.status(200).send(`${JSON.stringify(data)}`);
+      res.status(200).json(data);
     } catch(e) {
       console.log(e);
-      res.status(500).send(JSON.stringify(e));
+      res.status(500).json(e);
     } finally {
 
     }
@@ -60,10 +60,10 @@ serverStart = async () => {
   router.get('/status', async (req, res) => {
     try {
       const status = await fetch_status();
-      res.status(200).send(`${JSON.stringify(status)}`);
+      res.status(200).json(status);
     } catch(e) {
       console.log(e);
-      res.status(500).send(JSON.stringify(e));
+      res.status(500).json(e);
     } finally {
 
     }
