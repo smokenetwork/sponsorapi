@@ -15,7 +15,7 @@ fetch_data = async () => {
   if (typeof data !== 'undefined' && data !== null){
     // do nothing
   } else {
-    data = await db.getDB().all('SELECT * FROM sponsor ORDER BY txdatetime DESC');
+    data = await db.getDB().all('SELECT * FROM sponsor ORDER BY amount DESC');
 
     // remember to set cache
     myCache.set("data", data);
