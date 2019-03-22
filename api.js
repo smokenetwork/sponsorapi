@@ -33,7 +33,7 @@ fetch_data = async () => {
 
           let metadata = item['json_metadata'];
           if (typeof metadata === 'string') {
-            metadata = JSON.stringify(metadata);
+            metadata = JSON.parse(metadata);
           }
           let about = "Smoke Sponsor"; // default
           let website = "https://smoke.io"; // default
